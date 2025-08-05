@@ -393,16 +393,15 @@ const server = new FastMCP({
 function updateConfigFromURL(url: string) {
 	const urlConfig = parseConfigFromURL(url);
 	if (urlConfig) {
-		console.log('Config parsed from URL successfully');
+		console.log('Config loaded');
 		globalConfig = urlConfig;
 		try {
 			PROVIDERS = createProviders(globalConfig);
-			console.log('Providers initialized successfully');
 		} catch (error) {
-			console.error('Failed to initialize providers:', error instanceof Error ? error.message : 'Unknown error');
+			console.error('Provider init failed:', error instanceof Error ? error.message : 'Unknown error');
 		}
 	} else {
-		console.log('Failed to parse config from URL - configuration required');
+		console.log('Config parse failed');
 	}
 }
 
@@ -426,30 +425,17 @@ server.addTool({
 // Try to parse config from URL at startup if provided via environment variable
 const startupURL = process.env.MCP_SERVER_URL;
 if (startupURL) {
-	console.log('Attempting to parse config from MCP_SERVER_URL environment variable');
 	updateConfigFromURL(startupURL);
 }
+
+const PORT = process.env.PORT ? parseInt(process.env.PORT) : 8000;
 
 server.start({
 	transportType: "httpStream",
 	httpStream: {
 		endpoint: "/mcp",
-		port: 8080
+		port: PORT
 	}
 });
 
-console.log('Bitly MCP Server started on port 8080');
-console.log('Configuration status:', globalConfig.INFURA_API_KEY ? 'Configured ✓' : 'Not configured - URL config required');
-console.log('Available endpoints:');
-console.log('- POST /mcp - MCP protocol endpoint');
-console.log('');
-console.log('CONFIGURATION REQUIRED:');
-console.log('- Use the configure_from_url tool, or');
-console.log('- Set MCP_SERVER_URL environment variable, or');
-console.log('- Connect directly to: http://localhost:8080/mcp?config=<base64-encoded-json>');
-console.log('');
-console.log('Required config JSON structure:');
-console.log(JSON.stringify({
-	WALLET_PRIVATE_KEY: "your-wallet-private-key",
-	INFURA_API_KEY: "your-infura-api-key"
-}, null, 2));
+console.log(`Bitly MCP Server running on port ${PORT}`);
