@@ -2,3 +2,4 @@ dist/
 *.tsbuildinfo
 node_modules/
 package-lock.json
+.smithery
